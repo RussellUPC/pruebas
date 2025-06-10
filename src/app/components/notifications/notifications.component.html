@@ -1,0 +1,159 @@
+<div class="notifications-container">
+  <!-- Header con filtros -->
+  <div class="header-section">
+    <div class="header-actions">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>
+        <mat-icon>notifications</mat-icon>
+        Notificaciones
+        <mat-chip *ngIf="unreadCount > 0" class="unread-badge">{{ unreadCount }}</mat-chip>
+      </h1>
+      <div class="spacer"></div>
+      <button mat-button (click)="markAllAsRead()" *ngIf="unreadCount > 0" class="mark-all-read">
+        <mat-icon>done_all</mat-icon>
+        Marcar todas como leídas
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-section">
+      <mat-chip-set>
+        <mat-chip 
+          [class.selected]="selectedFilter === 'all'"
+          (click)="filterNotifications('all')">
+          Todas
+        </mat-chip>
+        <mat-chip 
+          [class.selected]="selectedFilter === 'unread'"
+          (click)="filterNotifications('unread')">
+          No leídas
+          <mat-chip-avatar *ngIf="unreadCount > 0">{{ unreadCount }}</mat-chip-avatar>
+        </mat-chip>
+        <mat-chip 
+          [class.selected]="selectedFilter === 'messages'"
+          (click)="filterNotifications('messages')">
+          <mat-icon>message</mat-icon>
+          Mensajes
+        </mat-chip>
+        <mat-chip 
+          [class.selected]="selectedFilter === 'bookings'"
+          (click)="filterNotifications('bookings')">
+          <mat-icon>event</mat-icon>
+          Citas
+        </mat-chip>
+        <mat-chip 
+          [class.selected]="selectedFilter === 'payments'"
+          (click)="filterNotifications('payments')">
+          <mat-icon>payment</mat-icon>
+          Pagos
+        </mat-chip>
+        <mat-chip 
+          [class.selected]="selectedFilter === 'system'"
+          (click)="filterNotifications('system')">
+          <mat-icon>settings</mat-icon>
+          Sistema
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+  </div>
+
+  <!-- Lista de notificaciones -->
+  <div class="notifications-list">
+    <div *ngIf="filteredNotifications.length === 0" class="empty-state">
+      <mat-icon>notifications_none</mat-icon>
+      <h3>No hay notificaciones</h3>
+      <p *ngIf="selectedFilter === 'all'">No tienes notificaciones en este momento.</p>
+      <p *ngIf="selectedFilter === 'unread'">¡Genial! No tienes notificaciones sin leer.</p>
+      <p *ngIf="selectedFilter !== 'all' && selectedFilter !== 'unread'">
+        No hay notificaciones de este tipo.
+      </p>
+    </div>
+
+    <mat-card 
+      *ngFor="let notification of filteredNotifications; trackBy: trackByNotificationId"
+      class="notification-card"
+      [class.unread]="!notification.read"
+      [class]="getPriorityClass(notification.priority)"
+      (click)="markAsRead(notification)">
+      
+      <div class="notification-content">
+        <!-- Avatar y tipo -->
+        <div class="notification-avatar">
+          <div class="avatar-container" *ngIf="notification.senderAvatar; else iconAvatar">
+            <img [src]="notification.senderAvatar" [alt]="notification.senderName">
+          </div>
+          <ng-template #iconAvatar>
+            <div class="icon-avatar" [style.background-color]="getNotificationColor(notification.type)">
+              <mat-icon>{{ getNotificationIcon(notification.type) }}</mat-icon>
+            </div>
+          </ng-template>
+          
+          <!-- Indicador de no leída -->
+          <div class="unread-indicator" *ngIf="!notification.read"></div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="notification-main">
+          <div class="notification-header">
+            <h3>{{ notification.title }}</h3>
+            <div class="notification-meta">
+              <span class="timestamp">{{ getTimeAgo(notification.timestamp) }}</span>
+              <mat-chip class="type-chip" [style.background-color]="getNotificationColor(notification.type)">
+                {{ notification.type === 'message' ? 'Mensaje' : 
+                   notification.type === 'booking' ? 'Cita' :
+                   notification.type === 'payment' ? 'Pago' :
+                   notification.type === 'system' ? 'Sistema' :
+                   notification.type === 'reminder' ? 'Recordatorio' : notification.type }}
+              </mat-chip>
+            </div>
+          </div>
+          
+          <p class="notification-message">{{ notification.message }}</p>
+          
+          <div class="notification-sender" *ngIf="notification.senderName && notification.senderName !== 'Sistema'">
+            <mat-icon>person</mat-icon>
+            <span>{{ notification.senderName }}</span>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="notification-actions">
+          <button 
+            mat-button 
+            color="primary" 
+            *ngIf="notification.actionUrl"
+            (click)="handleNotificationAction(notification); $event.stopPropagation()">
+            {{ notification.actionText || 'Ver más' }}
+          </button>
+          
+          <button 
+            mat-icon-button 
+            [matMenuTriggerFor]="notificationMenu"
+            (click)="$event.stopPropagation()"
+            class="menu-button">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          
+          <mat-menu #notificationMenu="matMenu">
+            <button mat-menu-item (click)="markAsRead(notification)" *ngIf="!notification.read">
+              <mat-icon>done</mat-icon>
+              <span>Marcar como leída</span>
+            </button>
+            <button mat-menu-item (click)="deleteNotification(notification.id)">
+              <mat-icon>delete</mat-icon>
+              <span>Eliminar</span>
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+
+      <!-- Barra de prioridad -->
+      <div class="priority-bar" [style.background-color]="
+        notification.priority === 'high' ? '#f44336' :
+        notification.priority === 'medium' ? '#ff9800' : '#4caf50'
+      "></div>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,196 @@
+<div class="profile-container">
+  <!-- Header con botón de regreso -->
+  <div class="header-actions">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Mi Perfil</h1>
+    <div class="spacer"></div>
+    <button mat-raised-button color="primary" (click)="toggleEdit()" *ngIf="!isEditing">
+      <mat-icon>edit</mat-icon>
+      Editar Perfil
+    </button>
+  </div>
+
+  <!-- Información del perfil -->
+  <mat-card class="profile-card">
+    <!-- Imagen de perfil y información básica -->
+    <div class="profile-header">
+      <div class="profile-image-section">
+        <div class="profile-image">
+          <img [src]="userProfile.profileImage" [alt]="userProfile.name">
+          <button mat-mini-fab color="accent" class="change-image-btn" (click)="changeProfileImage()" *ngIf="isEditing">
+            <mat-icon>camera_alt</mat-icon>
+          </button>
+        </div>
+      </div>
+      
+      <div class="profile-basic-info" *ngIf="!isEditing">
+        <h2>{{ userProfile.name }}</h2>
+        <p class="user-type">
+          <mat-icon>{{ isConsultant() ? 'business_center' : 'person' }}</mat-icon>
+          {{ isConsultant() ? 'Consultor' : 'Cliente' }}
+        </p>
+        <p class="join-date">
+          <mat-icon>calendar_today</mat-icon>
+          Miembro desde {{ getJoinDateFormatted() }}
+        </p>
+      </div>
+    </div>
+
+    <mat-divider *ngIf="!isEditing"></mat-divider>
+
+    <!-- Formulario de edición -->
+    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" *ngIf="isEditing" class="edit-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre completo</mat-label>
+          <input matInput formControlName="name" placeholder="Tu nombre completo">
+          <mat-error *ngIf="profileForm.get('name')?.hasError('required')">
+            El nombre es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="tu@email.com">
+          <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
+            El email es requerido
+          </mat-error>
+          <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
+            Ingresa un email válido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="phone" placeholder="+34 123 456 789">
+          <mat-error *ngIf="profileForm.get('phone')?.hasError('required')">
+            El teléfono es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Tipo de usuario</mat-label>
+          <mat-select formControlName="userType">
+            <mat-option value="client">Cliente</mat-option>
+            <mat-option value="consultant">Consultor</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Ubicación</mat-label>
+          <input matInput formControlName="location" placeholder="Ciudad, País">
+          <mat-error *ngIf="profileForm.get('location')?.hasError('required')">
+            La ubicación es requerida
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Campos específicos para consultores -->
+      <div *ngIf="profileForm.get('userType')?.value === 'consultant'">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Años de experiencia</mat-label>
+            <input matInput type="number" formControlName="experience" min="0" max="50">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Tarifa por hora (€)</mat-label>
+            <input matInput type="number" formControlName="hourlyRate" min="0">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Especialidades</mat-label>
+            <mat-select formControlName="specialties" multiple>
+              <mat-option *ngFor="let specialty of specialties" [value]="specialty">
+                {{ specialty }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Biografía</mat-label>
+          <textarea 
+            matInput 
+            formControlName="bio" 
+            rows="4" 
+            placeholder="Cuéntanos sobre ti, tu experiencia y qué te motiva...">
+          </textarea>
+          <mat-hint>Máximo 500 caracteres</mat-hint>
+          <mat-error *ngIf="profileForm.get('bio')?.hasError('maxlength')">
+            La biografía no puede exceder 500 caracteres
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" mat-button (click)="toggleEdit()">Cancelar</button>
+        <button type="submit" mat-raised-button color="primary" [disabled]="profileForm.invalid">
+          Guardar Cambios
+        </button>
+      </div>
+    </form>
+
+    <!-- Vista de solo lectura -->
+    <div *ngIf="!isEditing" class="profile-details">
+      <!-- Información de contacto -->
+      <div class="section">
+        <h3>Información de Contacto</h3>
+        <div class="info-item">
+          <mat-icon>email</mat-icon>
+          <span>{{ userProfile.email }}</span>
+        </div>
+        <div class="info-item">
+          <mat-icon>phone</mat-icon>
+          <span>{{ userProfile.phone }}</span>
+        </div>
+        <div class="info-item">
+          <mat-icon>location_on</mat-icon>
+          <span>{{ userProfile.location }}</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Biografía -->
+      <div class="section">
+        <h3>Acerca de mí</h3>
+        <p class="bio">{{ userProfile.bio || 'No hay biografía disponible.' }}</p>
+      </div>
+
+      <!-- Información específica para consultores -->
+      <div *ngIf="isConsultant()">
+        <mat-divider></mat-divider>
+        
+        <div class="section">
+          <h3>Información Profesional</h3>
+          <div class="info-item" *ngIf="userProfile.experience">
+            <mat-icon>work</mat-icon>
+            <span>{{ userProfile.experience }} años de experiencia</span>
+          </div>
+          <div class="info-item" *ngIf="userProfile.hourlyRate">
+            <mat-icon>attach_money</mat-icon>
+            <span>{{ userProfile.hourlyRate }}€/hora</span>
+          </div>
+        </div>
+
+        <div class="section" *ngIf="userProfile.specialties && userProfile.specialties.length > 0">
+          <h3>Especialidades</h3>
+          <mat-chip-set>
+            <mat-chip *ngFor="let specialty of userProfile.specialties">{{ specialty }}</mat-chip>
+          </mat-chip-set>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>

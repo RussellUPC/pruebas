@@ -1,0 +1,160 @@
+<div class="profile-container" *ngIf="professional">
+  <!-- Header con botón de regreso -->
+  <div class="header-actions">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Perfil del Profesional</h1>
+  </div>
+
+  <!-- Información principal del profesional -->
+  <mat-card class="profile-card">
+    <div class="profile-header">
+      <div class="profile-image">
+        <img [src]="professional.profileImage" [alt]="professional.name">
+      </div>
+      <div class="profile-info">
+        <h2>{{ professional.name }}</h2>
+        <div class="rating-section">
+          <div class="stars">
+            <mat-icon 
+              *ngFor="let filled of getStarArray(professional.rating)" 
+              [class.filled]="filled">
+              star
+            </mat-icon>
+          </div>
+          <span class="rating-text">{{ professional.rating }} ({{ professional.reviewCount }} reseñas)</span>
+        </div>
+        <div class="experience">
+          <mat-icon>work</mat-icon>
+          <span>{{ professional.experience }} años de experiencia</span>
+        </div>
+        <div class="rate">
+          <mat-icon>attach_money</mat-icon>
+          <span>${{ professional.hourlyRate }}/hora</span>
+        </div>
+        <div class="availability" [class.available]="professional.availability === 'Disponible'">
+          <mat-icon>schedule</mat-icon>
+          <span>{{ professional.availability }}</span>
+        </div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Especialidades -->
+    <div class="section">
+      <h3>Especialidades</h3>
+      <mat-chip-set>
+        <mat-chip *ngFor="let specialty of professional.specialties">{{ specialty }}</mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Descripción -->
+    <div class="section">
+      <h3>Acerca de mí</h3>
+      <p>{{ professional.description }}</p>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Educación -->
+    <div class="section">
+      <h3>Educación</h3>
+      <ul class="education-list">
+        <li *ngFor="let education of professional.education">
+          <mat-icon>school</mat-icon>
+          {{ education }}
+        </li>
+      </ul>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Certificaciones -->
+    <div class="section">
+      <h3>Certificaciones</h3>
+      <mat-chip-set>
+        <mat-chip *ngFor="let cert of professional.certifications">{{ cert }}</mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Idiomas -->
+    <div class="section">
+      <h3>Idiomas</h3>
+      <mat-chip-set>
+        <mat-chip *ngFor="let language of professional.languages">{{ language }}</mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="contactProfessional()">
+        <mat-icon>message</mat-icon>
+        Contactar
+      </button>
+      <button mat-raised-button color="accent" (click)="toggleRatingForm()">
+        <mat-icon>star_rate</mat-icon>
+        Valorar
+      </button>
+    </div>
+  </mat-card>
+
+  <!-- Formulario de valoración -->
+  <mat-card class="rating-card" *ngIf="showRatingForm">
+    <h3>Valorar a {{ professional.name }}</h3>
+    <form [formGroup]="ratingForm" (ngSubmit)="submitRating()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Calificación (1-5)</mat-label>
+        <mat-select formControlName="rating">
+          <mat-option value="1">1 - Muy malo</mat-option>
+          <mat-option value="2">2 - Malo</mat-option>
+          <mat-option value="3">3 - Regular</mat-option>
+          <mat-option value="4">4 - Bueno</mat-option>
+          <mat-option value="5">5 - Excelente</mat-option>
+        </mat-select>
+        <mat-error *ngIf="ratingForm.get('rating')?.hasError('required')">
+          La calificación es requerida
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Comentario</mat-label>
+        <textarea 
+          matInput 
+          formControlName="comment" 
+          rows="4" 
+          placeholder="Comparte tu experiencia con este profesional...">
+        </textarea>
+        <mat-error *ngIf="ratingForm.get('comment')?.hasError('required')">
+          El comentario es requerido
+        </mat-error>
+        <mat-error *ngIf="ratingForm.get('comment')?.hasError('minlength')">
+          El comentario debe tener al menos 10 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <div class="rating-actions">
+        <button type="button" mat-button (click)="toggleRatingForm()">Cancelar</button>
+        <button type="submit" mat-raised-button color="primary" [disabled]="ratingForm.invalid">
+          Enviar Valoración
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>
+
+<!-- Mensaje si no se encuentra el profesional -->
+<div class="not-found" *ngIf="!professional">
+  <mat-card>
+    <h2>Profesional no encontrado</h2>
+    <p>El profesional que buscas no existe o ha sido eliminado.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      Volver a la búsqueda
+    </button>
+  </mat-card>
+</div>

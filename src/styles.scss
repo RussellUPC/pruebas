@@ -1,0 +1,94 @@
+/* You can add global styles to this file, and also import other style files */
+
+// FinTeka Color Palette
+:root {
+  // Primary Colors
+  --primary-dark-turquoise: #007E7E;
+  --primary-gray: #555555;
+  
+  // Secondary Colors
+  --secondary-aqua-light: #35C1CA;
+  --secondary-soft-slate: #9A9A9A;
+  --secondary-cool-white: #F4FDFA;
+  --secondary-night-navy: #003642;
+  --secondary-sky-mist: #C0EAED;
+  
+  // Black/Grey Colors
+  --black: #212529;
+  --gray-4: #6C757D;
+  --gray-3: #ADB5BD;
+  --gray-2: #CED4DA;
+  --gray-1: #F8F9FA;
+  
+  // Typography Colors
+  --text-almost-black: #1C1C1C;
+  --text-light-gray: #F5F5F5;
+  --text-white: #FFFFFF;
+}
+
+html, body { 
+  height: 100%; 
+  background-color: var(--secondary-cool-white);
+}
+
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: var(--text-almost-black);
+}
+
+// Global Material Overrides
+.mat-toolbar.mat-primary {
+  background-color: var(--primary-dark-turquoise) !important;
+  color: var(--text-white) !important;
+}
+
+.mat-sidenav {
+  background-color: var(--text-white) !important;
+  border-right: 1px solid var(--gray-2) !important;
+}
+
+.mat-list-item:hover {
+  background-color: var(--secondary-sky-mist) !important;
+}
+
+.mat-list-item.active {
+  background-color: var(--secondary-aqua-light) !important;
+  color: var(--text-white) !important;
+}
+
+.mat-button, .mat-raised-button, .mat-flat-button {
+  &.mat-primary {
+    background-color: var(--primary-dark-turquoise) !important;
+    color: var(--text-white) !important;
+  }
+  
+  &.mat-accent {
+    background-color: var(--secondary-aqua-light) !important;
+    color: var(--text-white) !important;
+  }
+}
+
+.mat-form-field {
+  .mat-form-field-label {
+    color: var(--primary-gray) !important;
+  }
+  
+  &.mat-focused .mat-form-field-label {
+    color: var(--primary-dark-turquoise) !important;
+  }
+  
+  .mat-form-field-underline {
+    background-color: var(--gray-3) !important;
+  }
+  
+  &.mat-focused .mat-form-field-ripple {
+    background-color: var(--primary-dark-turquoise) !important;
+  }
+}
+
+.mat-card {
+  background-color: var(--text-white) !important;
+  border: 1px solid var(--gray-2) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}

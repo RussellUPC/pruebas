@@ -1,0 +1,130 @@
+<mat-toolbar color="primary" class="toolbar">
+  <span class="spacer"></span>
+  <span>Buscar Profesionales</span>
+</mat-toolbar>
+
+<div class="container">
+  <!-- Search Filters -->
+  <mat-card class="filters-card">
+    <mat-card-header>
+      <mat-card-title>Filtros de Búsqueda</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="searchForm">
+        <div class="filters-row">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar por nombre o descripción</mat-label>
+            <input matInput formControlName="searchTerm" placeholder="Ej: marketing digital, finanzas...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="specialty-field">
+            <mat-label>Especialidad</mat-label>
+            <mat-select formControlName="specialty">
+              <mat-option value="">Todas las especialidades</mat-option>
+              <mat-option *ngFor="let specialty of specialties" [value]="specialty">
+                {{specialty}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        
+        <div class="filters-row">
+          <div class="slider-field">
+            <label>Calificación mínima: {{searchForm.get('minRating')?.value}}</label>
+            <mat-slider min="0" max="5" step="0.5" formControlName="minRating">
+              <input matSliderThumb formControlName="minRating">
+            </mat-slider>
+          </div>
+          
+          <div class="slider-field">
+            <label>Tarifa máxima: ${{searchForm.get('maxRate')?.value}}/hora</label>
+            <mat-slider min="20" max="200" step="10" formControlName="maxRate">
+              <input matSliderThumb formControlName="maxRate">
+            </mat-slider>
+          </div>
+          
+          <mat-checkbox formControlName="availableOnly" class="availability-checkbox">
+            Solo disponibles
+          </mat-checkbox>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Results -->
+  <div class="results-section">
+    <h2>Profesionales Encontrados ({{filteredConsultants.length}})</h2>
+    
+    <div class="consultants-grid" *ngIf="filteredConsultants.length > 0; else noResults">
+      <mat-card class="consultant-card" *ngFor="let consultant of filteredConsultants">
+        <mat-card-header>
+          <div mat-card-avatar class="consultant-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <mat-card-title>{{consultant.name}}</mat-card-title>
+          <mat-card-subtitle>
+            <span class="experience">{{consultant.experience}} años de experiencia</span>
+            <span class="availability" [class.available]="consultant.availability" [class.unavailable]="!consultant.availability">
+              <mat-icon>{{consultant.availability ? 'check_circle' : 'schedule'}}</mat-icon>
+              {{consultant.availability ? 'Disponible' : 'No disponible'}}
+            </span>
+          </mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="rating">
+            <span class="stars">
+              <mat-icon *ngFor="let star of getRatingStars(consultant.rating)">{{star}}</mat-icon>
+            </span>
+            <span class="rating-value">{{consultant.rating}}</span>
+          </div>
+          
+          <div class="specialties">
+            <mat-chip-set>
+              <mat-chip *ngFor="let specialty of consultant.specialties">{{specialty}}</mat-chip>
+            </mat-chip-set>
+          </div>
+          
+          <p class="description">{{consultant.description}}</p>
+          
+          <div class="rate">
+            <mat-icon>attach_money</mat-icon>
+            <span>${{consultant.hourlyRate}}/hora</span>
+          </div>
+          
+          <div class="certifications" *ngIf="consultant.certifications">
+            <strong>Certificaciones:</strong>
+            <span *ngFor="let cert of consultant.certifications; let last = last">
+              {{cert}}<span *ngIf="!last">, </span>
+            </span>
+          </div>
+        </mat-card-content>
+        
+        <mat-card-actions>
+          <button mat-raised-button color="primary" 
+                  [disabled]="!consultant.availability"
+                  (click)="selectConsultant(consultant)">
+            <mat-icon>calendar_today</mat-icon>
+            {{consultant.availability ? 'Reservar Sesión' : 'No Disponible'}}
+          </button>
+          <button mat-button>
+            <mat-icon>visibility</mat-icon>
+            Ver Perfil
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+    
+    <ng-template #noResults>
+      <mat-card class="no-results">
+        <mat-card-content>
+          <mat-icon class="no-results-icon">search_off</mat-icon>
+          <h3>No se encontraron profesionales</h3>
+          <p>Intenta ajustar los filtros de búsqueda para encontrar más resultados.</p>
+        </mat-card-content>
+      </mat-card>
+    </ng-template>
+  </div>
+</div>
