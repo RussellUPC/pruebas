@@ -4,7 +4,7 @@
     <div class="auth-card" *ngIf="isLoginMode">
       <div class="auth-header">
         <div class="logo">
-          <img src="assets/images/FinTeka" alt="FinTeka" class="logo-image">
+          <img src="assets/images/FinTeka.png" alt="FinTeka" class="logo-image"/>
         </div>
         <h2>Iniciar Sesión</h2>
       </div>
@@ -64,6 +64,15 @@
           <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
             <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Tipo de usuario</mat-label>
+          <mat-select formControlName="userType">
+            <mat-option value="client">Cliente</mat-option>
+            <mat-option value="professional">Profesional</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>person_outline</mat-icon>
         </mat-form-field>
         
         <button mat-raised-button color="primary" type="submit" class="full-width auth-button">

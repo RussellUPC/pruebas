@@ -33,14 +33,14 @@
         <div class="filters-row">
           <div class="slider-field">
             <label>Calificación mínima: {{searchForm.get('minRating')?.value}}</label>
-            <mat-slider min="0" max="5" step="0.5" formControlName="minRating">
+            <mat-slider min="0" max="5" step="0.5">
               <input matSliderThumb formControlName="minRating">
             </mat-slider>
           </div>
           
           <div class="slider-field">
             <label>Tarifa máxima: ${{searchForm.get('maxRate')?.value}}/hora</label>
-            <mat-slider min="20" max="200" step="10" formControlName="maxRate">
+            <mat-slider min="20" max="200" step="10">
               <input matSliderThumb formControlName="maxRate">
             </mat-slider>
           </div>
@@ -109,7 +109,7 @@
             <mat-icon>calendar_today</mat-icon>
             {{consultant.availability ? 'Reservar Sesión' : 'No Disponible'}}
           </button>
-          <button mat-button>
+          <button mat-button (click)="selectConsultant(consultant)">
             <mat-icon>visibility</mat-icon>
             Ver Perfil
           </button>

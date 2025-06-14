@@ -7,7 +7,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-auth',
@@ -20,7 +22,8 @@ import { CommonModule } from '@angular/common';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatSelectModule
   ],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss'
@@ -34,7 +37,8 @@ export class AuthComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -44,33 +48,65 @@ export class AuthComponent {
     this.registerForm = this.fb.group({
       name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
+      password: ['', [Validators.required]],
+      userType: ['client', [Validators.required]]
     });
   }
 
   onLogin(): void {
     if (this.loginForm.valid) {
-      console.log('Login:', this.loginForm.value);
-      this.snackBar.open('¡Inicio de sesión exitoso!', 'Cerrar', {
-        duration: 3000
+      const { email, password } = this.loginForm.value;
+      
+      this.authService.login(email, password).subscribe({
+        next: (user) => {
+          console.log('Login successful:', user);
+          this.snackBar.open('¡Inicio de sesión exitoso!', 'Cerrar', {
+            duration: 3000
+          });
+          // Navegar a la búsqueda de consultores después del login
+          setTimeout(() => {
+            this.router.navigate(['/search-consultants']);
+          }, 1000);
+        },
+        error: (error) => {
+          console.error('Login error:', error);
+          this.snackBar.open('Error al iniciar sesión: ' + error.message, 'Cerrar', {
+            duration: 5000
+          });
+        }
       });
-      // Navegar a la búsqueda de consultores después del login
-      setTimeout(() => {
-        this.router.navigate(['/search-consultants']);
-      }, 1000);
     }
   }
 
   onRegister(): void {
     if (this.registerForm.valid) {
-      console.log('Register:', this.registerForm.value);
-      this.snackBar.open('¡Registro exitoso!', 'Cerrar', {
-        duration: 3000
+      const { name, email, password, userType } = this.registerForm.value;
+      
+      const newUser = {
+        name,
+        email,
+        userType,
+        createdAt: new Date()
+      };
+      
+      this.authService.register(newUser, password).subscribe({
+        next: (user) => {
+          console.log('Registration successful:', user);
+          this.snackBar.open('¡Registro exitoso!', 'Cerrar', {
+            duration: 3000
+          });
+          // Navegar a la búsqueda de consultores después del registro
+          setTimeout(() => {
+            this.router.navigate(['/search-consultants']);
+          }, 1000);
+        },
+        error: (error) => {
+          console.error('Registration error:', error);
+          this.snackBar.open('Error al registrarse: ' + error.message, 'Cerrar', {
+            duration: 5000
+          });
+        }
       });
-      // Navegar a la búsqueda de consultores después del registro
-      setTimeout(() => {
-        this.router.navigate(['/search-consultants']);
-      }, 1000);
     }
   }
 

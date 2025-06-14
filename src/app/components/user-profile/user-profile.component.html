@@ -18,7 +18,7 @@
     <div class="profile-header">
       <div class="profile-image-section">
         <div class="profile-image">
-          <img [src]="userProfile.profileImage" [alt]="userProfile.name">
+          <img [src]="userProfile.avatar" [alt]="userProfile.name">
           <button mat-mini-fab color="accent" class="change-image-btn" (click)="changeProfileImage()" *ngIf="isEditing">
             <mat-icon>camera_alt</mat-icon>
           </button>

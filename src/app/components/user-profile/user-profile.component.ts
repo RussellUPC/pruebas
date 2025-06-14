@@ -11,20 +11,28 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
+import { AuthService } from '../../services/auth.service';
+import { ClientService } from '../../services/client.service';
+import { ProfessionalService } from '../../services/professional.service';
+import { Client, Consultant } from '../../shared/models/user.model';
 
+// Interfaz para el perfil de usuario unificado
 interface UserProfile {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   userType: 'client' | 'consultant';
-  profileImage: string;
-  bio: string;
+  avatar: string;
+  joinDate: Date;
+  bio: string; // Biografía del usuario (description para consultores)
+  location: string; // Ubicación del usuario
+  // Campos específicos para consultores
   specialties?: string[];
   experience?: number;
   hourlyRate?: number;
-  location: string;
-  joinDate: Date;
+  // Campos específicos para clientes
+  company?: string;
 }
 
 @Component({
@@ -58,7 +66,7 @@ export class UserProfileComponent implements OnInit {
     email: 'juan.perez@email.com',
     phone: '+34 123 456 789',
     userType: 'client',
-    profileImage: 'https://via.placeholder.com/150x150',
+    avatar: 'https://via.placeholder.com/150x150',
     bio: 'Empresario con experiencia en startups tecnológicas. Busco asesoría en marketing digital y estrategia de negocios.',
     location: 'Madrid, España',
     joinDate: new Date('2023-01-15')
@@ -79,7 +87,10 @@ export class UserProfileComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private authService: AuthService,
+    private clientService: ClientService,
+    private professionalService: ProfessionalService
   ) {
     this.userProfile = this.mockUserProfile;
     
@@ -97,13 +108,83 @@ export class UserProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Simular carga de datos del usuario
     this.loadUserProfile();
   }
 
   loadUserProfile(): void {
-    // Aquí se cargarían los datos reales del usuario desde el backend
-    console.log('Cargando perfil del usuario...');
+    const currentUser = this.authService.getCurrentUser();
+    
+    if (!currentUser) {
+      this.snackBar.open('No hay usuario autenticado', 'Cerrar', {
+        duration: 3000
+      });
+      this.router.navigate(['/auth']);
+      return;
+    }
+    
+    if (currentUser.userType === 'client') {
+      this.clientService.getClientById(parseInt(currentUser.id)).subscribe({
+        next: (client) => {
+          this.userProfile = {
+            ...client,
+            userType: 'client',
+            avatar: client.avatar || 'https://via.placeholder.com/150x150',
+            joinDate: new Date(client.createdAt || new Date()),
+            bio: '', // Cliente no tiene bio, se inicializa vacía
+            location: client.location || ''
+          };
+          this.updateFormValues();
+        },
+        error: (error) => {
+          console.error('Error loading client profile:', error);
+          this.snackBar.open('Error al cargar el perfil', 'Cerrar', {
+            duration: 3000
+          });
+          // Usar datos de ejemplo como respaldo
+          this.userProfile = this.mockUserProfile;
+          this.updateFormValues();
+        }
+      });
+    } else {
+      this.professionalService.getProfessionalById(parseInt(currentUser.id)).subscribe({
+        next: (professional) => {
+          this.userProfile = {
+            ...professional,
+            userType: 'consultant',
+            avatar: professional.avatar || 'https://via.placeholder.com/150x150',
+            joinDate: new Date(professional.createdAt || new Date()),
+            bio: professional.description || '', // Mapear description a bio
+            location: professional.location || ''
+          };
+          this.updateFormValues();
+        },
+        error: (error) => {
+          console.error('Error loading professional profile:', error);
+          this.snackBar.open('Error al cargar el perfil', 'Cerrar', {
+            duration: 3000
+          });
+          // Usar datos de ejemplo como respaldo
+          this.userProfile = this.mockUserProfile;
+          this.updateFormValues();
+        }
+      });
+    }
+  }
+  
+  updateFormValues(): void {
+    this.profileForm.patchValue({
+      name: this.userProfile.name,
+      email: this.userProfile.email,
+      phone: this.userProfile.phone || '',
+      location: this.userProfile.location || '',
+      bio: this.userProfile.bio || '',
+      // Campos específicos para consultores
+      specialties: this.userProfile.specialties || [],
+      experience: this.userProfile.experience || 0,
+      hourlyRate: this.userProfile.hourlyRate || 0,
+      // Campos específicos para clientes
+      company: (this.userProfile as any).company || ''
+    });
   }
 
   toggleEdit(): void {
@@ -128,19 +209,85 @@ export class UserProfileComponent implements OnInit {
     if (this.profileForm.valid) {
       const formData = this.profileForm.value;
       
-      // Actualizar el perfil local
-      this.userProfile = {
+      // Crear objeto actualizado con los datos del formulario
+      const updatedProfile = {
         ...this.userProfile,
         ...formData
       };
       
-      console.log('Guardando perfil:', this.userProfile);
-      
-      this.snackBar.open('Perfil actualizado exitosamente', 'Cerrar', {
-        duration: 3000
-      });
-      
-      this.isEditing = false;
+      // Guardar en el servidor según el tipo de usuario
+      if (updatedProfile.userType === 'client') {
+        // Para clientes, necesitamos mapear los campos de UserProfile a Client
+        const clientData: Partial<Client> = {
+          id: updatedProfile.id,
+          name: updatedProfile.name,
+          email: updatedProfile.email,
+          phone: updatedProfile.phone,
+          company: (updatedProfile as any).company // Si existe
+        };
+        
+        this.clientService.updateClient(parseInt(updatedProfile.id), clientData).subscribe({
+          next: (updatedClient) => {
+            this.userProfile = {
+              ...updatedClient,
+              userType: 'client',
+              avatar: updatedClient.avatar || this.userProfile.avatar,
+              joinDate: this.userProfile.joinDate,
+              bio: this.userProfile.bio,
+              location: this.userProfile.location
+            };
+            
+            this.snackBar.open('Perfil actualizado exitosamente', 'Cerrar', {
+              duration: 3000
+            });
+            
+            this.isEditing = false;
+          },
+          error: (error) => {
+            console.error('Error updating client profile:', error);
+            this.snackBar.open('Error al actualizar el perfil', 'Cerrar', {
+              duration: 3000
+            });
+          }
+        });
+      } else {
+        // Para consultores, necesitamos mapear los campos de UserProfile a Consultant
+        const professionalData: Partial<Consultant> = {
+          id: updatedProfile.id,
+          name: updatedProfile.name,
+          email: updatedProfile.email,
+          phone: updatedProfile.phone,
+          specialties: updatedProfile.specialties,
+          experience: updatedProfile.experience,
+          hourlyRate: updatedProfile.hourlyRate,
+          description: updatedProfile.bio // Mapear bio a description
+        };
+        
+        this.professionalService.updateProfessional(parseInt(updatedProfile.id), professionalData).subscribe({
+          next: (updatedProfessional) => {
+            this.userProfile = {
+              ...updatedProfessional,
+              userType: 'consultant',
+              avatar: updatedProfessional.avatar || this.userProfile.avatar,
+              joinDate: this.userProfile.joinDate,
+              bio: updatedProfessional.description || '', // Mapear description a bio
+              location: updatedProfessional.location || ''
+            };
+            
+            this.snackBar.open('Perfil actualizado exitosamente', 'Cerrar', {
+              duration: 3000
+            });
+            
+            this.isEditing = false;
+          },
+          error: (error) => {
+            console.error('Error updating professional profile:', error);
+            this.snackBar.open('Error al actualizar el perfil', 'Cerrar', {
+              duration: 3000
+            });
+          }
+        });
+      }
     } else {
       this.snackBar.open('Por favor, completa todos los campos requeridos', 'Cerrar', {
         duration: 3000

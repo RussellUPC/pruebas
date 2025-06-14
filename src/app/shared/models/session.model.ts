@@ -21,14 +21,15 @@ export interface Notification {
   type: 'info' | 'warning' | 'success' | 'error';
   read: boolean;
   createdAt: Date;
-  relatedSessionId?: string;
+  relatedEntityId?: string;
+  relatedEntityType?: string;
 }
 
 export interface Availability {
   id: string;
-  consultantId: string;
-  dayOfWeek: number; // 0-6 (Sunday-Saturday)
-  startTime: string; // HH:mm format
-  endTime: string; // HH:mm format
-  isActive: boolean;
+  profesionalId: string; // ID del profesional/consultor
+  fechaInicio: string; // Fecha y hora de inicio
+  fechaFin: string; // Fecha y hora de fin
+  disponible: boolean; // Si el horario está disponible
+  clienteId?: string; // ID del cliente que reservó (opcional)
 }

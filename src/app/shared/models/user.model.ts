@@ -6,6 +6,7 @@ export interface User {
   userType: 'client' | 'consultant';
   avatar?: string;
   createdAt: Date;
+  location?: string; // Añadido para compatibilidad con UserProfile
 }
 
 export interface Consultant extends User {
@@ -14,7 +15,7 @@ export interface Consultant extends User {
   rating: number;
   hourlyRate: number;
   availability: boolean;
-  description: string;
+  description: string; // Equivalente a 'bio' en UserProfile
   certifications?: string[];
 }
 

@@ -11,6 +11,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { ProfessionalService } from '../../services/professional.service';
+import { SessionService } from '../../services/session.service';
 
 interface Professional {
   id: number;
@@ -90,7 +92,9 @@ export class ProfessionalProfileComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private professionalService: ProfessionalService,
+    private sessionService: SessionService
   ) {
     this.ratingForm = this.fb.group({
       rating: ['', [Validators.required, Validators.min(1), Validators.max(5)]],
@@ -106,11 +110,45 @@ export class ProfessionalProfileComponent implements OnInit {
   }
 
   loadProfessional(id: number): void {
-    // Simular carga de datos
-    this.professional = this.mockProfessionals.find(p => p.id === id) || null;
-    if (!this.professional) {
-      this.router.navigate(['/search-consultants']);
-    }
+    this.professionalService.getProfessionalById(id).subscribe({
+      next: (professional) => {
+        if (professional) {
+          // Transformar los datos del profesional al formato que espera el componente
+          this.professional = {
+            id: parseInt(professional.id),
+            name: professional.name,
+            specialties: professional.specialties || [],
+            experience: professional.experience || 0,
+            rating: professional.rating || 4.0,
+            reviewCount: 0, // Este campo no existe en el modelo Consultant
+            hourlyRate: professional.hourlyRate || 0,
+            description: professional.description || '',
+            education: [], // Este campo no existe en el modelo Consultant
+            certifications: professional.certifications || [],
+            languages: [], // Este campo no existe en el modelo Consultant
+            availability: professional.availability ? 'Disponible' : 'No disponible',
+            profileImage: professional.avatar || 'https://via.placeholder.com/200x200' // Usar el campo avatar del modelo User
+          };
+        } else {
+          this.snackBar.open('Profesional no encontrado', 'Cerrar', {
+            duration: 3000
+          });
+          this.router.navigate(['/search-consultants']);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading professional:', error);
+        this.snackBar.open('Error al cargar el perfil del profesional', 'Cerrar', {
+          duration: 3000
+        });
+        
+        // Usar datos de ejemplo como respaldo
+        this.professional = this.mockProfessionals.find(p => p.id === id) || null;
+        if (!this.professional) {
+          this.router.navigate(['/search-consultants']);
+        }
+      }
+    });
   }
 
   getStarArray(rating: number): boolean[] {
@@ -126,23 +164,54 @@ export class ProfessionalProfileComponent implements OnInit {
   }
 
   submitRating(): void {
-    if (this.ratingForm.valid) {
+    if (this.ratingForm.valid && this.professional) {
       const { rating, comment } = this.ratingForm.value;
-      console.log('Nueva valoración:', { rating, comment, professionalId: this.professional?.id });
       
-      this.snackBar.open('¡Valoración enviada exitosamente!', 'Cerrar', {
-        duration: 3000
-      });
+      const reviewData = {
+        professionalId: this.professional.id.toString(),
+        rating: parseInt(rating),
+        comment: comment,
+        date: new Date().toISOString()
+      };
       
-      this.showRatingForm = false;
-      this.ratingForm.reset();
+      // En un sistema real, esto enviaría la valoración al backend
+      // Por ahora, simulamos una respuesta exitosa
+      setTimeout(() => {
+        // Actualizar la valoración en la interfaz
+        if (this.professional) {
+          const newRating = (this.professional.rating * this.professional.reviewCount + parseInt(rating)) / 
+                          (this.professional.reviewCount + 1);
+          
+          this.professional.rating = parseFloat(newRating.toFixed(1));
+          this.professional.reviewCount += 1;
+        }
+        
+        this.snackBar.open('¡Valoración enviada exitosamente!', 'Cerrar', {
+          duration: 3000
+        });
+        
+        this.showRatingForm = false;
+        this.ratingForm.reset();
+      }, 500);
     }
   }
 
   contactProfessional(): void {
-    this.snackBar.open('Funcionalidad de contacto próximamente', 'Cerrar', {
-      duration: 3000
-    });
+    if (this.professional) {
+      // Aquí se implementaría la lógica para crear una sesión o iniciar un chat
+      // Por ahora, mostramos un mensaje informativo
+      this.snackBar.open('Iniciando contacto con ' + this.professional.name, 'Cerrar', {
+        duration: 3000
+      });
+      
+      // En una implementación real, se crearía una sesión y se redigiría al chat
+      // this.sessionService.createSession({
+      //   professionalId: this.professional.id.toString(),
+      //   clientId: 'current-user-id',
+      //   date: new Date().toISOString(),
+      //   status: 'pending'
+      // }).subscribe(...);
+    }
   }
 
   goBack(): void {

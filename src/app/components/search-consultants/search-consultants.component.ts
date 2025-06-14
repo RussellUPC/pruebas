@@ -13,6 +13,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Consultant } from '../../shared/models/user.model';
+import { ProfessionalService } from '../../services/professional.service';
 
 @Component({
   selector: 'app-search-consultants',
@@ -51,7 +52,11 @@ export class SearchConsultantsComponent implements OnInit {
     'Educación'
   ];
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder, 
+    private router: Router,
+    private professionalService: ProfessionalService
+  ) {
     this.searchForm = this.fb.group({
       searchTerm: [''],
       specialty: [''],
@@ -62,8 +67,7 @@ export class SearchConsultantsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadMockConsultants();
-    this.filteredConsultants = this.consultants;
+    this.loadConsultants();
     
     // Subscribe to form changes for real-time filtering
     this.searchForm.valueChanges.subscribe(() => {
@@ -71,8 +75,23 @@ export class SearchConsultantsComponent implements OnInit {
     });
   }
 
-  loadMockConsultants() {
-    // Mock data for demonstration
+  loadConsultants() {
+    this.professionalService.getProfessionals().subscribe({
+      next: (data) => {
+        // Ahora el servicio ya maneja el mapeo de datos
+        this.consultants = data;
+        this.filteredConsultants = [...this.consultants];
+      },
+      error: (error) => {
+        console.error('Error al cargar profesionales:', error);
+        // Cargar datos de respaldo en caso de error
+        this.loadBackupConsultants();
+      }
+    });
+  }
+
+  loadBackupConsultants() {
+    // Datos de respaldo en caso de que falle la API
     this.consultants = [
       {
         id: '1',
@@ -115,6 +134,7 @@ export class SearchConsultantsComponent implements OnInit {
         createdAt: new Date()
       }
     ];
+    this.filteredConsultants = [...this.consultants];
   }
 
   filterConsultants() {
@@ -140,7 +160,14 @@ export class SearchConsultantsComponent implements OnInit {
 
   selectConsultant(consultant: Consultant) {
     console.log('Selected consultant:', consultant);
-    this.router.navigate(['/professional-profile', consultant.id]);
+    // Verificar si el consultor está disponible para reservar una sesión
+    if (consultant.availability) {
+      // Navegar a la página de reserva o perfil del profesional
+      this.router.navigate(['/professional-profile', consultant.id]);
+    } else {
+      // Si no está disponible, solo mostrar el perfil
+      this.router.navigate(['/professional-profile', consultant.id]);
+    }
   }
 
   getRatingStars(rating: number): string[] {

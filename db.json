@@ -1,0 +1,108 @@
+{
+  "profesionales": [
+    {
+      "id": 1,
+      "nombre": "Juan Pérez",
+      "especialidad": "Psicólogo",
+      "calificacion": 4.8,
+      "disponibilidad": true,
+      "email": "juan.perez@ejemplo.com",
+      "telefono": "123-456-7890",
+      "descripcion": "Psicólogo clínico con 10 años de experiencia en terapia cognitivo-conductual."
+    },
+    {
+      "id": 2,
+      "nombre": "María López",
+      "especialidad": "Nutricionista",
+      "calificacion": 4.5,
+      "disponibilidad": true,
+      "email": "maria.lopez@ejemplo.com",
+      "telefono": "234-567-8901",
+      "descripcion": "Nutricionista especializada en trastornos alimenticios y nutrición deportiva."
+    },
+    {
+      "id": 3,
+      "nombre": "Carlos Rodríguez",
+      "especialidad": "Fisioterapeuta",
+      "calificacion": 4.9,
+      "disponibilidad": false,
+      "email": "carlos.rodriguez@ejemplo.com",
+      "telefono": "345-678-9012",
+      "descripcion": "Fisioterapeuta deportivo con experiencia en rehabilitación de lesiones."
+    }
+  ],
+  "clientes": [
+    {
+      "id": 1,
+      "nombre": "Ana Martínez",
+      "email": "ana.martinez@ejemplo.com",
+      "telefono": "456-789-0123"
+    },
+    {
+      "id": 2,
+      "nombre": "Pedro Sánchez",
+      "email": "pedro.sanchez@ejemplo.com",
+      "telefono": "567-890-1234"
+    }
+  ],
+  "notificaciones": [
+    {
+      "id": 1,
+      "profesionalId": 1,
+      "mensaje": "Ha actualizado su disponibilidad",
+      "fecha": "2023-11-15T10:30:00",
+      "leida": false
+    },
+    {
+      "id": 2,
+      "profesionalId": 3,
+      "mensaje": "Ha cambiado su estado a no disponible",
+      "fecha": "2023-11-14T15:45:00",
+      "leida": true
+    }
+  ],
+  "agenda": [
+    {
+      "id": 1,
+      "profesionalId": 1,
+      "fechaInicio": "2023-11-20T09:00:00",
+      "fechaFin": "2023-11-20T10:00:00",
+      "disponible": true
+    },
+    {
+      "id": 2,
+      "profesionalId": 1,
+      "fechaInicio": "2023-11-20T10:30:00",
+      "fechaFin": "2023-11-20T11:30:00",
+      "disponible": false,
+      "clienteId": 1
+    },
+    {
+      "id": 3,
+      "profesionalId": 2,
+      "fechaInicio": "2023-11-21T14:00:00",
+      "fechaFin": "2023-11-21T15:00:00",
+      "disponible": true
+    }
+  ],
+  "sesiones": [
+    {
+      "id": 1,
+      "profesionalId": 1,
+      "clienteId": 1,
+      "fecha": "2023-11-20T10:30:00",
+      "duracion": 60,
+      "estado": "confirmada",
+      "notas": "Primera sesión de evaluación"
+    },
+    {
+      "id": 2,
+      "profesionalId": 2,
+      "clienteId": 2,
+      "fecha": "2023-11-22T16:00:00",
+      "duracion": 45,
+      "estado": "pendiente",
+      "notas": "Consulta inicial sobre plan nutricional"
+    }
+  ]
+}

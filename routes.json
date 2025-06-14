@@ -1,0 +1,7 @@
+{
+  "/api/profesionales": "/profesionales",
+  "/api/profesionales/:id": "/profesionales/:id",
+  "/api/clientes": "/clientes",
+  "/api/clientes/:id": "/clientes/:id",
+  "/api/*": "/$1"
+}

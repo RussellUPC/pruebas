@@ -12,5 +12,10 @@ export const routes: Routes = [
   { path: 'professional-profile/:id', component: ProfessionalProfileComponent },
   { path: 'user-profile', component: UserProfileComponent },
   { path: 'notifications', component: NotificationsComponent },
+  // Rutas para las acciones de notificaciones
+  { path: 'session-booking', component: SearchConsultantsComponent }, // Temporalmente redirigimos a SearchConsultants
+  { path: 'messages', component: SearchConsultantsComponent }, // Temporalmente redirigimos a SearchConsultants
+  { path: 'payments', component: SearchConsultantsComponent }, // Temporalmente redirigimos a SearchConsultants
+  { path: 'calendar', component: SearchConsultantsComponent }, // Temporalmente redirigimos a SearchConsultants
   { path: '**', redirectTo: '/auth' }
 ];

@@ -33,9 +33,9 @@
           <mat-icon>attach_money</mat-icon>
           <span>${{ professional.hourlyRate }}/hora</span>
         </div>
-        <div class="availability" [class.available]="professional.availability === 'Disponible'">
+        <div class="availability" [class.available]="professional.availability">
           <mat-icon>schedule</mat-icon>
-          <span>{{ professional.availability }}</span>
+          <span>{{ professional.availability ? 'Disponible' : 'No disponible' }}</span>
         </div>
       </div>
     </div>
