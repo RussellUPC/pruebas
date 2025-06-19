@@ -4,18 +4,18 @@
     <div class="auth-card" *ngIf="isLoginMode">
       <div class="auth-header">
         <div class="logo">
-          <img src="assets/images/FinTeka.png" alt="FinTeka" class="logo-image"/>
+          <img src="assets/images/FinTeka.svg" alt="FinTeka" class="logo-image"/>
         </div>
         <h2>Iniciar Sesión</h2>
       </div>
-      
+
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
           <input matInput type="email" formControlName="email">
           <mat-icon matSuffix>email</mat-icon>
         </mat-form-field>
-        
+
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Contraseña</mat-label>
           <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
@@ -23,19 +23,19 @@
             <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
         </mat-form-field>
-        
+
         <button mat-raised-button color="primary" type="submit" class="full-width auth-button">
           Iniciar Sesión
         </button>
       </form>
-      
+
       <div class="auth-footer">
-        <p>¿No tienes cuenta? 
+        <p>¿No tienes cuenta?
           <a href="#" (click)="toggleMode(); $event.preventDefault()" class="link">Regístrate</a>
         </p>
       </div>
     </div>
-    
+
     <!-- Register Form -->
     <div class="auth-card" *ngIf="!isLoginMode">
       <div class="auth-header">
@@ -44,20 +44,20 @@
         </div>
         <h2>Registrarse</h2>
       </div>
-      
+
       <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="auth-form">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Nombre completo</mat-label>
           <input matInput formControlName="name">
           <mat-icon matSuffix>person</mat-icon>
         </mat-form-field>
-        
+
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
           <input matInput type="email" formControlName="email">
           <mat-icon matSuffix>email</mat-icon>
         </mat-form-field>
-        
+
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Contraseña</mat-label>
           <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
@@ -65,7 +65,7 @@
             <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
         </mat-form-field>
-        
+
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Tipo de usuario</mat-label>
           <mat-select formControlName="userType">
@@ -74,14 +74,14 @@
           </mat-select>
           <mat-icon matSuffix>person_outline</mat-icon>
         </mat-form-field>
-        
+
         <button mat-raised-button color="primary" type="submit" class="full-width auth-button">
           Registrarse
         </button>
       </form>
-      
+
       <div class="auth-footer">
-        <p>¿Ya tienes cuenta? 
+        <p>¿Ya tienes cuenta?
           <a href="#" (click)="toggleMode(); $event.preventDefault()" class="link">Inicia sesión</a>
         </p>
       </div>
