@@ -7,6 +7,7 @@
       "calificacion": 4.8,
       "disponibilidad": true,
       "email": "juan.perez@ejemplo.com",
+      "password": "Admin123*",
       "telefono": "123-456-7890",
       "descripcion": "Psicólogo clínico con 10 años de experiencia en terapia cognitivo-conductual."
     },
@@ -17,6 +18,7 @@
       "calificacion": 4.5,
       "disponibilidad": true,
       "email": "maria.lopez@ejemplo.com",
+      "password": "Admin123*",
       "telefono": "234-567-8901",
       "descripcion": "Nutricionista especializada en trastornos alimenticios y nutrición deportiva."
     },
@@ -27,6 +29,7 @@
       "calificacion": 4.9,
       "disponibilidad": false,
       "email": "carlos.rodriguez@ejemplo.com",
+      "password": "Admin123*",
       "telefono": "345-678-9012",
       "descripcion": "Fisioterapeuta deportivo con experiencia en rehabilitación de lesiones."
     }
@@ -36,12 +39,14 @@
       "id": 1,
       "nombre": "Ana Martínez",
       "email": "ana.martinez@ejemplo.com",
+      "password": "Admin123*",
       "telefono": "456-789-0123"
     },
     {
       "id": 2,
       "nombre": "Pedro Sánchez",
       "email": "pedro.sanchez@ejemplo.com",
+      "password": "Admin123*",
       "telefono": "567-890-1234"
     }
   ],
