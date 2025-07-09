@@ -20,7 +20,6 @@ export class ClientService {
       email: apiClient.email,
       phone: apiClient.telefono || '',
       userType: 'client',
-      company: apiClient.empresa || '',
       createdAt: new Date(apiClient.createdAt || new Date())
     };
   }
@@ -31,7 +30,6 @@ export class ClientService {
       nombre: client.name,
       email: client.email,
       telefono: client.phone || '',
-      empresa: client.company || '',
       createdAt: client.createdAt.toISOString()
     };
   }
@@ -61,8 +59,7 @@ export class ClientService {
     if (client.name) apiUpdate.nombre = client.name;
     if (client.email) apiUpdate.email = client.email;
     if (client.phone) apiUpdate.telefono = client.phone;
-    if (client.company) apiUpdate.empresa = client.company;
-    
+
     return this.http.patch<any>(`${this.apiUrl}/clientes/${id}`, apiUpdate).pipe(
       map(updatedClient => this.mapToClient(updatedClient))
     );

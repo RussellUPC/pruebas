@@ -68,12 +68,50 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Tipo de usuario</mat-label>
-          <mat-select formControlName="userType">
+          <mat-select formControlName="userType" (selectionChange)="onUserTypeChange($event.value)">
             <mat-option value="client">Cliente</mat-option>
-            <mat-option value="professional">Profesional</mat-option>
+            <mat-option value="consultant">Profesional</mat-option>
           </mat-select>
           <mat-icon matSuffix>person_outline</mat-icon>
         </mat-form-field>
+
+        <!-- Client extra fields -->
+        <ng-container *ngIf="registerForm.get('userType')?.value === 'client'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="phone">
+            <mat-icon matSuffix>phone</mat-icon>
+          </mat-form-field>
+        </ng-container>
+
+        <!-- Consultant extra fields -->
+        <ng-container *ngIf="registerForm.get('userType')?.value === 'consultant'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="phone">
+            <mat-icon matSuffix>phone</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Especialidades (separadas por coma)</mat-label>
+            <input matInput formControlName="specialties">
+            <mat-icon matSuffix>star</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Experiencia (años)</mat-label>
+            <input matInput type="number" formControlName="experience">
+            <mat-icon matSuffix>work</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tarifa por hora</mat-label>
+            <input matInput type="number" formControlName="hourlyRate">
+            <mat-icon matSuffix>attach_money</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="description"></textarea>
+            <mat-icon matSuffix>description</mat-icon>
+          </mat-form-field>
+        </ng-container>
 
         <button mat-raised-button color="primary" type="submit" class="full-width auth-button">
           Registrarse

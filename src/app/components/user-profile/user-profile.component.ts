@@ -31,8 +31,6 @@ interface UserProfile {
   specialties?: string[];
   experience?: number;
   hourlyRate?: number;
-  // Campos específicos para clientes
-  company?: string;
 }
 
 @Component({
@@ -93,7 +91,7 @@ export class UserProfileComponent implements OnInit {
     private professionalService: ProfessionalService
   ) {
     this.userProfile = this.mockUserProfile;
-    
+
     this.profileForm = this.fb.group({
       name: [this.userProfile.name, [Validators.required]],
       email: [this.userProfile.email, [Validators.required, Validators.email]],
@@ -113,7 +111,7 @@ export class UserProfileComponent implements OnInit {
 
   loadUserProfile(): void {
     const currentUser = this.authService.getCurrentUser();
-    
+
     if (!currentUser) {
       this.snackBar.open('No hay usuario autenticado', 'Cerrar', {
         duration: 3000
@@ -121,7 +119,7 @@ export class UserProfileComponent implements OnInit {
       this.router.navigate(['/auth']);
       return;
     }
-    
+
     if (currentUser.userType === 'client') {
       this.clientService.getClientById(parseInt(currentUser.id)).subscribe({
         next: (client) => {
@@ -170,7 +168,7 @@ export class UserProfileComponent implements OnInit {
       });
     }
   }
-  
+
   updateFormValues(): void {
     this.profileForm.patchValue({
       name: this.userProfile.name,
@@ -181,9 +179,7 @@ export class UserProfileComponent implements OnInit {
       // Campos específicos para consultores
       specialties: this.userProfile.specialties || [],
       experience: this.userProfile.experience || 0,
-      hourlyRate: this.userProfile.hourlyRate || 0,
-      // Campos específicos para clientes
-      company: (this.userProfile as any).company || ''
+      hourlyRate: this.userProfile.hourlyRate || 0
     });
   }
 
@@ -208,13 +204,13 @@ export class UserProfileComponent implements OnInit {
   saveProfile(): void {
     if (this.profileForm.valid) {
       const formData = this.profileForm.value;
-      
+
       // Crear objeto actualizado con los datos del formulario
       const updatedProfile = {
         ...this.userProfile,
         ...formData
       };
-      
+
       // Guardar en el servidor según el tipo de usuario
       if (updatedProfile.userType === 'client') {
         // Para clientes, necesitamos mapear los campos de UserProfile a Client
@@ -222,10 +218,9 @@ export class UserProfileComponent implements OnInit {
           id: updatedProfile.id,
           name: updatedProfile.name,
           email: updatedProfile.email,
-          phone: updatedProfile.phone,
-          company: (updatedProfile as any).company // Si existe
+          phone: updatedProfile.phone
         };
-        
+
         this.clientService.updateClient(parseInt(updatedProfile.id), clientData).subscribe({
           next: (updatedClient) => {
             this.userProfile = {
@@ -236,11 +231,11 @@ export class UserProfileComponent implements OnInit {
               bio: this.userProfile.bio,
               location: this.userProfile.location
             };
-            
+
             this.snackBar.open('Perfil actualizado exitosamente', 'Cerrar', {
               duration: 3000
             });
-            
+
             this.isEditing = false;
           },
           error: (error) => {
@@ -262,7 +257,7 @@ export class UserProfileComponent implements OnInit {
           hourlyRate: updatedProfile.hourlyRate,
           description: updatedProfile.bio // Mapear bio a description
         };
-        
+
         this.professionalService.updateProfessional(parseInt(updatedProfile.id), professionalData).subscribe({
           next: (updatedProfessional) => {
             this.userProfile = {
@@ -273,11 +268,11 @@ export class UserProfileComponent implements OnInit {
               bio: updatedProfessional.description || '', // Mapear description a bio
               location: updatedProfessional.location || ''
             };
-            
+
             this.snackBar.open('Perfil actualizado exitosamente', 'Cerrar', {
               duration: 3000
             });
-            
+
             this.isEditing = false;
           },
           error: (error) => {

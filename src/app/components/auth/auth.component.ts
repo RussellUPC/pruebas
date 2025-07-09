@@ -56,7 +56,7 @@ export class AuthComponent {
   onLogin(): void {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
-      
+
       this.authService.login(email, password).subscribe({
         next: (user) => {
           console.log('Login successful:', user);
@@ -81,14 +81,32 @@ export class AuthComponent {
   onRegister(): void {
     if (this.registerForm.valid) {
       const { name, email, password, userType } = this.registerForm.value;
-      
-      const newUser = {
-        name,
-        email,
-        userType,
-        createdAt: new Date()
-      };
-      
+      let newUser: any;
+
+      if (userType === 'consultant') {
+        newUser = {
+          name,
+          email,
+          phone: this.registerForm.value.phone || '',
+          userType,
+          specialties: [],
+          experience: 0,
+          rating: 0,
+          hourlyRate: 0,
+          availability: true,
+          description: '',
+          createdAt: new Date()
+        };
+      } else {
+        newUser = {
+          name,
+          email,
+          phone: this.registerForm.value.phone || '',
+          userType,
+          createdAt: new Date()
+        };
+      }
+
       this.authService.register(newUser, password).subscribe({
         next: (user) => {
           console.log('Registration successful:', user);
@@ -112,5 +130,17 @@ export class AuthComponent {
 
   toggleMode(): void {
     this.isLoginMode = !this.isLoginMode;
+  }
+
+  onUserTypeChange(userType: string): void {
+    if (userType === 'consultant') {
+      this.registerForm.addControl('phone', this.fb.control('', Validators.required));
+      this.registerForm.addControl('specialties', this.fb.control('', Validators.required));
+      this.registerForm.addControl('experience', this.fb.control('', Validators.required));
+      this.registerForm.addControl('hourlyRate', this.fb.control('', Validators.required));
+      this.registerForm.addControl('description', this.fb.control('', Validators.required));
+    } else {
+      this.registerForm.addControl('phone', this.fb.control('', Validators.required));
+    }
   }
 }

@@ -19,6 +19,4 @@ export interface Consultant extends User {
   certifications?: string[];
 }
 
-export interface Client extends User {
-  company?: string;
-}
+export interface Client extends User {}
